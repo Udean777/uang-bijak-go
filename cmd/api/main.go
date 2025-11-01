@@ -1,0 +1,69 @@
+package main
+
+import (
+	"context"
+	"log"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5/pgxpool"
+
+	"github.com/Udean777/uang-bijak-go/internal/config"
+	"github.com/Udean777/uang-bijak-go/internal/handler"
+	"github.com/Udean777/uang-bijak-go/internal/middleware"
+	"github.com/Udean777/uang-bijak-go/internal/repository"
+	"github.com/Udean777/uang-bijak-go/internal/service"
+)
+
+func main() {
+	log.Println("Start application....")
+
+	cfg := config.LoadConfig()
+
+	dbpool, err := pgxpool.New(context.Background(), cfg.DatabaseURL)
+	if err != nil {
+		log.Fatalf("Gagal menghubungkan ke database: %v", err)
+	}
+	defer dbpool.Close()
+
+	if err := dbpool.Ping(context.Background()); err != nil {
+		log.Fatalf("Gagal melakukan ping ke database: %v", err)
+	}
+	log.Println("Berhasil terhubung ke database")
+
+	userRepo := repository.NewUserRepository(dbpool)
+	userService := service.NewUserService(userRepo)
+	userHandler := handler.NewUserHandler(userService)
+
+	authService := service.NewAuthService(userRepo, cfg.JwtSecret, cfg.AccessTokenTTL, cfg.RefreshTokenTTL)
+	authHandler := handler.NewAuthHandler(authService)
+
+	authMiddleware := middleware.AuthMiddleware(cfg.JwtSecret)
+
+	router := gin.Default()
+
+	router.GET("/ping", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "pong!",
+		})
+	})
+
+	authRoutes := router.Group("/auth")
+	{
+		authRoutes.POST("/register", authHandler.Register)
+		authRoutes.POST("/login", authHandler.Login)
+		authRoutes.POST("/refresh", authHandler.Refresh)
+	}
+
+	api := router.Group("/api/v1")
+	api.Use(authMiddleware)
+	{
+		api.GET("/me", userHandler.GetMe)
+	}
+
+	serverAddr := ":" + cfg.AppPort
+	log.Printf("Menjalankan server di %s", serverAddr)
+	if err := router.Run(serverAddr); err != nil {
+		log.Fatalf("Gagal menjalankan server: %v", err)
+	}
+}

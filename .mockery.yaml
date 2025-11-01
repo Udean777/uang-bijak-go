@@ -1,0 +1,15 @@
+# .mockery.yaml
+with-expecter: True
+packages:
+  # --- Untuk UserRepository ---
+  github.com/Udean777/uang-bijak-go/internal/repository:
+    interfaces:
+      UserRepository:
+    output: ./internal/repository/mocks
+
+  # --- Untuk AuthService & UserService ---
+  github.com/Udean777/uang-bijak-go/internal/service:
+    interfaces:
+      AuthService:
+      UserService:
+    output: ./internal/service/mocks

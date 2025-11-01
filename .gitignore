@@ -1,0 +1,59 @@
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+
+# Output of the go coverage tool
+coverage.out
+
+# Output and build folders
+/bin/
+/_build/
+/build/
+/_output/
+*.out
+
+# Dependency directories (uncomment if you vendor dependencies)
+vendor/
+
+# Compiled package objects
+pkg/
+
+# Go workspace file
+go.work
+
+# Environment and secret files
+.env
+.env.*
+*.env
+.secrets
+.secret.*
+
+# IDEs and editors
+.idea/
+.vscode/
+*.iml
+*.sublime-workspace
+*.sublime-project
+
+# Editor temporary files
+*~
+*.swp
+*.swo
+.#*
+*.orig
+
+# macOS / Windows
+.DS_Store
+Thumbs.db
+
+# Logs and debugging
+*.log
+
+# Node/npm artifacts (if present in mono-repo)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
