@@ -4,6 +4,7 @@ packages:
     interfaces:
       UserRepository:
       CategoryRepository:
+      WalletRepository:
     output: ./internal/repository/mocks
 
   github.com/Udean777/uang-bijak-go/internal/service:
@@ -11,4 +12,5 @@ packages:
       AuthService:
       UserService:
       CategoryService:
+      WalletService:
     output: ./internal/service/mocks

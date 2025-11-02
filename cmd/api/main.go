@@ -43,6 +43,10 @@ func main() {
 	categoryService := service.NewCategoryService(categoryRepo)
 	categoryHandler := handler.NewCategoryHandler(categoryService)
 
+	walletRepo := repository.NewWalletRepository(dbpool)
+	walletService := service.NewWalletService(walletRepo)
+	walletHandler := handler.NewWalletHandler(walletService)
+
 	router := gin.Default()
 
 	router.GET("/ping", func(c *gin.Context) {
@@ -69,6 +73,14 @@ func main() {
 			catRoutes.GET("/", categoryHandler.GetUserCategories)
 			catRoutes.PUT("/:id", categoryHandler.UpdateCategory)
 			catRoutes.DELETE("/:id", categoryHandler.DeleteCategory)
+		}
+
+		walletRoutes := api.Group("/wallets")
+		{
+			walletRoutes.POST("/", walletHandler.CreateWallet)
+			walletRoutes.GET("/", walletHandler.GetUserWallets)
+			walletRoutes.PUT("/:id", walletHandler.UpdateWallet)
+			walletRoutes.DELETE("/:id", walletHandler.DeleteWallet)
 		}
 	}
 
