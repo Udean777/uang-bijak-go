@@ -37,8 +37,11 @@ func main() {
 
 	authService := service.NewAuthService(userRepo, cfg.JwtSecret, cfg.AccessTokenTTL, cfg.RefreshTokenTTL)
 	authHandler := handler.NewAuthHandler(authService)
-
 	authMiddleware := middleware.AuthMiddleware(cfg.JwtSecret)
+
+	categoryRepo := repository.NewCategoryRepository(dbpool)
+	categoryService := service.NewCategoryService(categoryRepo)
+	categoryHandler := handler.NewCategoryHandler(categoryService)
 
 	router := gin.Default()
 
@@ -59,6 +62,14 @@ func main() {
 	api.Use(authMiddleware)
 	{
 		api.GET("/me", userHandler.GetMe)
+
+		catRoutes := api.Group("/categories")
+		{
+			catRoutes.POST("/", categoryHandler.CreateCategory)
+			catRoutes.GET("/", categoryHandler.GetUserCategories)
+			catRoutes.PUT("/:id", categoryHandler.UpdateCategory)
+			catRoutes.DELETE("/:id", categoryHandler.DeleteCategory)
+		}
 	}
 
 	serverAddr := ":" + cfg.AppPort
