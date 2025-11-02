@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/jackc/pgx/v5"
+
 	"github.com/Udean777/uang-bijak-go/internal/models"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -16,7 +18,7 @@ type WalletRepository interface {
 	Update(ctx context.Context, id int64, name string) error
 	Delete(ctx context.Context, id int64) error
 	CheckOwnership(ctx context.Context, walletID int64, userID uuid.UUID) (*models.Wallet, error)
-	// TODO: Tambahkan UpdateBalance(ctx, id, amount) di sini untuk dipakai oleh service Transaksi
+	UpdateBalanceTx(ctx context.Context, tx pgx.Tx, walletID int64, amount int64) error
 }
 
 type walletRepository struct {
@@ -106,4 +108,11 @@ func (r *walletRepository) CheckOwnership(ctx context.Context, walletID int64, u
 		return nil, err
 	}
 	return &w, nil
+}
+
+func (r *walletRepository) UpdateBalanceTx(ctx context.Context, tx pgx.Tx, walletID int64, amount int64) error {
+	query := `UPDATE wallets SET balance = balance + $1, updated_at = $2 WHERE id = $3`
+
+	_, err := tx.Exec(ctx, query, amount, time.Now(), walletID)
+	return err
 }

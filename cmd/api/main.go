@@ -47,6 +47,10 @@ func main() {
 	walletService := service.NewWalletService(walletRepo)
 	walletHandler := handler.NewWalletHandler(walletService)
 
+	trxRepo := repository.NewTransactionRepository(dbpool)
+	trxService := service.NewTransactionService(dbpool, trxRepo, walletRepo, categoryRepo)
+	trxHandler := handler.NewTransactionHandler(trxService)
+
 	router := gin.Default()
 
 	router.GET("/ping", func(c *gin.Context) {
@@ -81,6 +85,13 @@ func main() {
 			walletRoutes.GET("/", walletHandler.GetUserWallets)
 			walletRoutes.PUT("/:id", walletHandler.UpdateWallet)
 			walletRoutes.DELETE("/:id", walletHandler.DeleteWallet)
+		}
+
+		trxRoutes := api.Group("/transactions")
+		{
+			trxRoutes.POST("/", trxHandler.CreateTransaction)
+			trxRoutes.GET("/", trxHandler.GetUserTransactions)
+			// TODO: Tambahkan PUT /:id dan DELETE /:id
 		}
 	}
 
