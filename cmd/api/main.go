@@ -51,6 +51,9 @@ func main() {
 	trxService := service.NewTransactionService(dbpool, trxRepo, walletRepo, categoryRepo)
 	trxHandler := handler.NewTransactionHandler(trxService)
 
+	dashboardService := service.NewDashboardService(walletRepo, trxRepo)
+	dashboardHandler := handler.NewDashboardHandler(dashboardService)
+
 	router := gin.Default()
 
 	router.GET("/ping", func(c *gin.Context) {
@@ -93,6 +96,8 @@ func main() {
 			trxRoutes.GET("/", trxHandler.GetUserTransactions)
 			// TODO: Tambahkan PUT /:id dan DELETE /:id
 		}
+
+		api.GET("/dashboard", dashboardHandler.GetDashboardSummary)
 	}
 
 	serverAddr := ":" + cfg.AppPort

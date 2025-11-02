@@ -19,6 +19,7 @@ type WalletRepository interface {
 	Delete(ctx context.Context, id int64) error
 	CheckOwnership(ctx context.Context, walletID int64, userID uuid.UUID) (*models.Wallet, error)
 	UpdateBalanceTx(ctx context.Context, tx pgx.Tx, walletID int64, amount int64) error
+	GetTotalBalanceByUserID(ctx context.Context, userID uuid.UUID) (int64, error)
 }
 
 type walletRepository struct {
@@ -115,4 +116,15 @@ func (r *walletRepository) UpdateBalanceTx(ctx context.Context, tx pgx.Tx, walle
 
 	_, err := tx.Exec(ctx, query, amount, time.Now(), walletID)
 	return err
+}
+
+func (r *walletRepository) GetTotalBalanceByUserID(ctx context.Context, userID uuid.UUID) (int64, error) {
+	query := `SELECT COALESCE(SUM(balance), 0) FROM wallets WHERE user_id = $1`
+
+	var totalBalance int64
+	err := r.db.QueryRow(ctx, query, userID).Scan(&totalBalance)
+	if err != nil {
+		return 0, err
+	}
+	return totalBalance, nil
 }

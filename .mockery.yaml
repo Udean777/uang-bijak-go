@@ -15,4 +15,5 @@ packages:
       CategoryService:
       WalletService:
       TransactionService:
+      DashboardService:
     output: ./internal/service/mocks

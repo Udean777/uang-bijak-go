@@ -10,6 +10,8 @@ import (
 
 	pgx "github.com/jackc/pgx/v5"
 
+	time "time"
+
 	uuid "github.com/google/uuid"
 )
 
@@ -129,6 +131,72 @@ func (_c *MockTransactionRepository_GetAllByUserID_Call) Return(_a0 []models.Tra
 }
 
 func (_c *MockTransactionRepository_GetAllByUserID_Call) RunAndReturn(run func(context.Context, uuid.UUID) ([]models.Transaction, error)) *MockTransactionRepository_GetAllByUserID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetTotalIncomeAndExpense provides a mock function with given fields: ctx, userID, startTime, endTime
+func (_m *MockTransactionRepository) GetTotalIncomeAndExpense(ctx context.Context, userID uuid.UUID, startTime time.Time, endTime time.Time) (int64, int64, error) {
+	ret := _m.Called(ctx, userID, startTime, endTime)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetTotalIncomeAndExpense")
+	}
+
+	var r0 int64
+	var r1 int64
+	var r2 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, time.Time, time.Time) (int64, int64, error)); ok {
+		return rf(ctx, userID, startTime, endTime)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, time.Time, time.Time) int64); ok {
+		r0 = rf(ctx, userID, startTime, endTime)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, time.Time, time.Time) int64); ok {
+		r1 = rf(ctx, userID, startTime, endTime)
+	} else {
+		r1 = ret.Get(1).(int64)
+	}
+
+	if rf, ok := ret.Get(2).(func(context.Context, uuid.UUID, time.Time, time.Time) error); ok {
+		r2 = rf(ctx, userID, startTime, endTime)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
+// MockTransactionRepository_GetTotalIncomeAndExpense_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetTotalIncomeAndExpense'
+type MockTransactionRepository_GetTotalIncomeAndExpense_Call struct {
+	*mock.Call
+}
+
+// GetTotalIncomeAndExpense is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userID uuid.UUID
+//   - startTime time.Time
+//   - endTime time.Time
+func (_e *MockTransactionRepository_Expecter) GetTotalIncomeAndExpense(ctx interface{}, userID interface{}, startTime interface{}, endTime interface{}) *MockTransactionRepository_GetTotalIncomeAndExpense_Call {
+	return &MockTransactionRepository_GetTotalIncomeAndExpense_Call{Call: _e.mock.On("GetTotalIncomeAndExpense", ctx, userID, startTime, endTime)}
+}
+
+func (_c *MockTransactionRepository_GetTotalIncomeAndExpense_Call) Run(run func(ctx context.Context, userID uuid.UUID, startTime time.Time, endTime time.Time)) *MockTransactionRepository_GetTotalIncomeAndExpense_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(time.Time), args[3].(time.Time))
+	})
+	return _c
+}
+
+func (_c *MockTransactionRepository_GetTotalIncomeAndExpense_Call) Return(income int64, expense int64, err error) *MockTransactionRepository_GetTotalIncomeAndExpense_Call {
+	_c.Call.Return(income, expense, err)
+	return _c
+}
+
+func (_c *MockTransactionRepository_GetTotalIncomeAndExpense_Call) RunAndReturn(run func(context.Context, uuid.UUID, time.Time, time.Time) (int64, int64, error)) *MockTransactionRepository_GetTotalIncomeAndExpense_Call {
 	_c.Call.Return(run)
 	return _c
 }

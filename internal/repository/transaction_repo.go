@@ -13,6 +13,7 @@ import (
 type TransactionRepository interface {
 	CreateTx(ctx context.Context, tx pgx.Tx, transaction *models.Transaction) error
 	GetAllByUserID(ctx context.Context, userID uuid.UUID) ([]models.Transaction, error)
+	GetTotalIncomeAndExpense(ctx context.Context, userID uuid.UUID, startTime time.Time, endTime time.Time) (income int64, expense int64, err error)
 	// TODO: tambahkan GetByID, Update, Delete
 }
 
@@ -65,4 +66,28 @@ func (r *transactionRepository) GetAllByUserID(ctx context.Context, userID uuid.
 	}
 
 	return transactions, nil
+}
+
+func (r *transactionRepository) GetTotalIncomeAndExpense(ctx context.Context, userID uuid.UUID, startTime time.Time, endTime time.Time) (int64, int64, error) {
+	query := `
+		SELECT 
+			COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) AS total_income,
+			COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) AS total_expense
+		FROM 
+			transactions
+		WHERE 
+			user_id = $1 
+			AND transaction_date >= $2 
+			AND transaction_date <= $3
+	`
+
+	var totalIncome int64
+	var totalExpense int64
+
+	err := r.db.QueryRow(ctx, query, userID, startTime, endTime).Scan(&totalIncome, &totalExpense)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return totalIncome, totalExpense, nil
 }
